@@ -37,7 +37,7 @@ class PlayList(models.Model):
       return self.user_id + "의 공개 재생목록_" + str(self.pk) # self.user.nick_name -> self.user_id
     return self.user_id + "의 비공개 재생목록_" + str(self.pk)
   
-class Follow(models.Model):
+class Relationship(models.Model):
   following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following') # user -> followee -> following
   follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower')
   follow_at = models.DateTimeField(auto_now_add=True)
