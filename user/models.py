@@ -44,3 +44,4 @@ class Follow(models.Model):
   
   def __str__(self):
     return str(self.follower_id) + " is following " + str(self.followee_id) # followee.nick_name -> followee_id : depth줄이기
+  
