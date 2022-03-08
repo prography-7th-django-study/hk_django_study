@@ -1,6 +1,5 @@
 from django.db import models
 from datetime import datetime
-from music.models import Album
 
 
 class Group(models.Model):
@@ -23,10 +22,3 @@ class Artist(models.Model):
   
   def __str__(self):
     return self.stage_name
-
-class ArtistAlbum(models.Model):
-  artist = models.ForeignKey(Artist, on_delete=models.PROTECT)
-  album = models.ForeignKey(Album, on_delete=models.PROTECT)
-  
-  def __str__(self):
-    return "artist" + str(self.artist_id) + "'s album" + str(self.album_id)

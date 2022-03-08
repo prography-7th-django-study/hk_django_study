@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'music',
     'artist',
     'genre',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -109,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -126,5 +127,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_ROOT = 'media'
-MEDIA_URL = 'media'
+MEDIA_ROOT = 'mediafiles'
+MEDIA_URL = 'media/'

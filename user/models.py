@@ -15,7 +15,7 @@ class User(models.Model):
   profile_image = models.ImageField(upload_to=get_profile_image_path, blank=True, null=True) 
   introduction = models.TextField(blank=True, null=True)
   joined_at = models.DateTimeField(auto_now_add=True)
-  relationships = models.ManyToManyField("self", through='Follow', blank=True) # through 모델이 있어야 불러오기 좋음
+  relationships = models.ManyToManyField("self", through='Relationship', blank=True) # through 모델이 있어야 불러오기 좋음
   like_musics = models.ManyToManyField(Song, blank=True, related_name="users_like") # null=True제거 : ManyToManyField는 원래 허용
   like_genres = models.ManyToManyField(Genre, blank=True)
   like_playlists = models.ManyToManyField('PlayList', blank=True, related_name="users_like")
@@ -34,8 +34,8 @@ class PlayList(models.Model):
     
   def __str__(self):
     if self.is_public is True:
-      return self.user_id + "의 공개 재생목록_" + str(self.pk) # self.user.nick_name -> self.user_id
-    return self.user_id + "의 비공개 재생목록_" + str(self.pk)
+      return str(self.user_id) + "의 공개 재생목록_" + str(self.pk) # self.user.nick_name -> self.user_id
+    return str(self.user_id) + "의 비공개 재생목록_" + str(self.pk)
   
 class Relationship(models.Model):
   following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following') # user -> followee -> following
@@ -43,4 +43,4 @@ class Relationship(models.Model):
   follow_at = models.DateTimeField(auto_now_add=True)
   
   def __str__(self):
-    return str(self.follower_id) + " is following " + str(self.followee_id) # followee.nick_name -> followee_id : depth줄이기
+    return str(self.follower_id) + " is following " + str(self.following_id) # followee.nick_name -> followee_id : depth줄이기
