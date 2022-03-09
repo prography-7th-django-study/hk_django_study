@@ -1,4 +1,3 @@
-# mixins 사용시
 from .serializers import GroupSerializer, ArtistSerializer
 from .models import Group, Artist
 from music.serializers import AlbumSerializer
@@ -16,15 +15,16 @@ from .serializers import *
 # queryset 과 serializer_class 를 지정해주기만 하면 나머지는 상속받은 Mixin 과 연결해주기만 하면 된다.
 
 # CBV - Mixin - Group
-class GroupPostListMixins(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+# Mixin = 부분 상속, genericapiview를 기본으로 하는 애
+class GroupPostListMixins(generics.ListCreateAPIView):
   queryset = Group.objects.all()
   serializer_class = GroupSerializer
   
-  def get(self, request, *args, **kwargs):
-    return self.list(request)
+  # def get(self, request, *args, **kwargs):
+  #   return self.list(request)
   
-  def post(self, request, *args, **kwargs):
-    return self.create(request)
+  # def post(self, request, *args, **kwargs):
+  #   return self.create(request)
   
 class GroupDetailMixins(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
   queryset = Group.objects.all()
@@ -39,12 +39,8 @@ class GroupDetailMixins(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixi
   def delete(self, request, *args, **kwargs):
     return self.delete(request, *args, **kwargs)
 
-## generics APIView ##
-# Mixin 을 상속함으로서 반복되는 내용을 많이 줄일 수 있었습니다. 
-# 하지만 여러 개를 상속해야 하다보니 가독성이 떨어집니다. 
-# 다행히도 rest_framework 에서는 저들을 상속한 새로운 클래스를 정의해놨습니다.
 
-# CBV - Generics - Artist
+
 class ArtistListGenericAPIView(generics.ListCreateAPIView):
   queryset = Artist.objects.all()
   serializer_class = ArtistSerializer
@@ -52,3 +48,11 @@ class ArtistListGenericAPIView(generics.ListCreateAPIView):
 class ArtistDetailGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
   queryset = Artist.objects.all()
   serializer_class = ArtistSerializer
+  
+'''
+>> generics APIView
+Generics -> 최소 기능 생성
+Mixin 을 상속함으로서 반복되는 내용을 많이 줄일 수 있었습니다. 
+하지만 여러 개를 상속해야 하다보니 가독성이 떨어집니다. 
+다행히도 rest_framework 에서는 저들을 상속한 새로운 클래스를 정의해놨습니다.
+'''

@@ -8,6 +8,7 @@ urlpatterns = [
   path('groups', GroupPostListMixins.as_view()),
   path('groups/<int:pk>', GroupDetailMixins.as_view()),
   # Arist
+  # APIView -> View
   path('artists', ArtistListGenericAPIView.as_view()),
   path('artists/<int:pk>', ArtistDetailGenericAPIView.as_view()),
 ]

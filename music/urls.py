@@ -1,14 +1,12 @@
-import imp
-from urllib.parse import urlparse
 from django.urls import path, include
 from . import views
 from rest_framework.routers import DefaultRouter
 
 # ViewSet은 Router를 통해서 하나의 url 로 처리가 가능
+router = DefaultRouter()
+router.register(r'albums', views.AlbumViewSet)
+router.register(r'songs', views.SongViewSet)
 
 urlpatterns = [
-  path('songs/', views.songs),
-  path('songs/<int:pk>', views.songs_detail),
-  path('albums/list', views.AlbumViewSet.list),
-  path('albums/<int:pk>', views.AlbumViewSet.retrieve),
+  path('', include(router.urls)),
 ]

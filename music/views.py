@@ -13,12 +13,14 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
 class AlbumViewSet(viewsets.ModelViewSet):
   queryset = Album.objects.all()
-  serializer_class = AlbumSerializer    
-  
-class SongViewSet(ModelViewSet):
+  serializer_class = AlbumSerializer  
+
+class SongViewSet(viewsets.ModelViewSet):
   queryset = Song.objects.all()
   serializer_class = SongSerializer   
 
+'''
+SongViewSet의 Router역할이 아래와같이 http method별로 함수 실행하는 것
 songs = SongViewSet.as_view({
   'get': 'list',
   'post': 'create',
@@ -30,3 +32,4 @@ songs_detail = SongViewSet.as_view({
   'patch': 'partial_update',
   'delete': 'destroy',
 })
+'''
