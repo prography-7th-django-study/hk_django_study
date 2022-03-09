@@ -2,6 +2,8 @@ from django.shortcuts import render
 from .models import Album, Song
 from .serializers import AlbumSerializer, SongSerializer
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet  
 
 # ViewSet
@@ -10,8 +12,8 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 # ModelViewSet 이 ReadOnlyModelViewSet 의 기능들을 함축
 
 class AlbumViewSet(viewsets.ModelViewSet):
-  query = Album.objects.all()
-  serializer_class = AlbumSerializer
+  queryset = Album.objects.all()
+  serializer_class = AlbumSerializer    
   
 class SongViewSet(ModelViewSet):
   queryset = Song.objects.all()

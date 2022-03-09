@@ -11,7 +11,7 @@ def get_album_image_path(self, filename):
 
 class Album(models.Model):
   name = models.CharField(max_length=150)
-  artists = models.ManyToManyField(Artist, through='ArtistAlbum', related_name='albums', blank=True) #ForeignKey -> ManyToManyField & through: 여러 아티스트가 모일 경우 고려
+  artists = models.ManyToManyField(Artist, through='ArtistAlbum', blank=True) #ForeignKey -> ManyToManyField & through: 여러 아티스트가 모일 경우 고려
     # black=True를 해줘야함.???
   image = models.ImageField(upload_to=get_album_image_path)
   description = models.TextField()

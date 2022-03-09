@@ -1,6 +1,7 @@
 # mixins 사용시
 from .serializers import GroupSerializer, ArtistSerializer
 from .models import Group, Artist
+from music.serializers import AlbumSerializer
 from rest_framework import mixins
 from rest_framework import generics #provide commonly needed behaviour
 

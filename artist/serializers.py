@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Group, Artist
+from music.models import Album
 from music.serializers import AlbumSerializer # Nested relationships
   # If the field is used to represent a to-many relationship, you should add the many=True flag to the serializer field.
 

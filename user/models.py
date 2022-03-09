@@ -26,7 +26,7 @@ class User(models.Model):
   
 class PlayList(models.Model):
   name = models.CharField(max_length=50) # default 이름 필요 -> pk이용해서 V나 T에서 처리 => 생성시 receiver이용해서 이름 부여
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='playlists')
   created_at = models.DateField(auto_now_add=True)
   updated_at = models.DateField(auto_now=True) 
   musics = models.ManyToManyField(Song, blank=True)

@@ -8,5 +8,7 @@ from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
   path('songs/', views.songs),
-  path('songs/<int:pk>/', views.songs_detail),
+  path('songs/<int:pk>', views.songs_detail),
+  path('albums/list', views.AlbumViewSet.list),
+  path('albums/<int:pk>', views.AlbumViewSet.retrieve),
 ]

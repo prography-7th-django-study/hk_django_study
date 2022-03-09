@@ -8,8 +8,11 @@ class UserSerializer(serializers.ModelSerializer):
   class Meta:
     model = User
     fields = '__all__'
+    extra_fields = ['playlists'] # 왜 안보이지...
     
 class PlayListSerializer(serializers.ModelSerializer):  
+  user_id = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+    # represent the target of the relationship using its primary key.
   class Meta:
     model = PlayList
     fields = '__all__'
