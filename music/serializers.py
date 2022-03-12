@@ -1,32 +1,43 @@
 from rest_framework import serializers
-from .models import *
+from .models import Album, Song
 
 
-class ChoiceCustomizingField(serializers.ModelSerializer):
+# CustomizingFields   
+class ArtistCustomizingField(serializers.RelatedField):
     def to_representation(self, value):
-        pass
-      
-class ArtistCustomizingField(serializers.ModelSerializer):
-    def to_representation(self, value):
-        return "%d : %s" % (value.pk, value.stage_name)
-    
-    class Meta:
-        model = Artist
-        fields = '__all__'
+        return "Artist %d: %s" % (value.pk, value.stage_name)
 
+# Serializers
 class AlbumSerializer(serializers.ModelSerializer):
-    artists = ArtistCustomizingField(many=True)
+    artists = ArtistCustomizingField(many=True, read_only=True)
     class Meta:
         model = Album
-        fields = ['id','name','artists','image', 'type']
+        fields = ['id','name','artists','image','type']
     
-class AlbumDetailSerializer(serializers.ModelSerializer):
+class AlbumDetailSerializer(AlbumSerializer, serializers.ModelSerializer):
     release_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M")
+    songs = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='title'
+    )
+    class Meta(AlbumSerializer.Meta):
+        model = Album
+        fields = AlbumSerializer.Meta.fields + ['songs','description','release_at']
+   
+class AlbumArtistSerializer(serializers.ModelSerializer):
+    artists = ArtistCustomizingField(many=True, read_only=True)
     class Meta:
         model = Album
-        fields = ['id','name','artist','image','description','release_at','type']
-    
+        fields = ['artists','image']
+                   
 class SongSerializer(serializers.ModelSerializer):
+    duration = serializers.DateTimeField(format='%H:%M')
+    album = AlbumArtistSerializer()
     class Meta:
         model = Song
-        fields = '__all__'
+        fields = ['id','title','featuring','is_title','duration','album']
+        
+class SongDetailSerializer(SongSerializer, serializers.ModelSerializer):
+    class Meta(SongSerializer.Meta):
+        fields = SongSerializer.Meta.fields + ['lyrics','description','genre','released_date']

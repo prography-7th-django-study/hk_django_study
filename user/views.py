@@ -1,38 +1,42 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from rest_framework.response import Response
+from rest_framework import viewsets, status
 from .models import PlayList, Relationship, User
 from .serializers import *
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 
-class UserViewSet(viewsets.ViewSet):
-    def list(self, request):
-        queryet = User.objects.all()
-        serializer = UserListSerializer(queryet, many=True)
-        return Response(serializer.data)
-      
-    def retrieve(self, request, pk=None): # the DefaultRouter will configure detail actions to contain pk in their URL patterns.
-        queryset = User.objects.all()
-        user = get_object_or_404(queryset, pk=pk)
-        serializer = UserDetailSerializer(user)
-        return Response(serializer.data)
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    
+    def get_serializer_class(self):
+        if self.action == 'list':
+             return UserListSerializer
+        else:
+            return UserDetailSerializer
         
-class PlayListViewSet(viewsets.ViewSet):
-    def list(self, request):
-        queryset = PlayList.objects.all()
-        serializer = PlayListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def retrieve(self, request, pk=None):
-        queryset = PlayList.objects.all()
-        playlist = get_object_or_404(queryset, pk=pk)
-        serializer = PlayListDetailSerializer(playlist)
-        return Response(serializer.data)
+    # def partial_update(self, request, pk=None):
+    #     user = self.get_object()
+    #     serializer = UserPasswordSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         user.set_password(serializer.validated_data['password'])
+    #         user.save()
+    #         return Response({'status': 'password set'})
+    #     else:
+    #         return Response(serializer.errors,
+    #                         status=status.HTTP_400_BAD_REQUEST)
+        
+class PlayListViewSet(viewsets.ModelViewSet):
+    queryset = PlayList.objects.all()
+    
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return PlayListSerializer
+        else:
+            return PlayListDetailSerializer
       
-class RelationshipViewSet(viewsets.ModelViewSet):
+class RelationshipViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Relationship.objects.all()
     serializer_class = RelationshipSerializer
-
 
 '''
 FBV 사용은 거의 안함. ping보내는 용도정도, 직관적인 것 구현하는 정도, View를 사용하면 틀이 커지니까
