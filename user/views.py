@@ -1,8 +1,6 @@
 from rest_framework import viewsets, status
 from .models import PlayList, Relationship, User
 from .serializers import *
-from rest_framework.decorators import action
-from rest_framework.response import Response
 
 
 class UserViewSet(viewsets.ModelViewSet):
