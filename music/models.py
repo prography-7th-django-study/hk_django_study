@@ -12,7 +12,7 @@ def get_album_image_path(self, filename):
 
 class Album(models.Model):
     name = models.CharField(max_length=150)
-    artists = models.ManyToManyField(Artist, through='ArtistAlbum', related_name='albums', blank=True)
+    artists = models.ManyToManyField('artist.Artist', through='ArtistAlbum', related_name='albums', blank=True)
     image = models.ImageField(upload_to=get_album_image_path)
     description = models.TextField()
     release_at = models.DateTimeField(default=datetime.now)
@@ -30,14 +30,7 @@ class Album(models.Model):
     
     def __str__(self):
         return self.name
-
-class ArtistAlbum(models.Model):
-    artist = models.ForeignKey(Artist, on_delete=models.PROTECT)
-    album = models.ForeignKey(Album, on_delete=models.PROTECT)
-    
-    def __str__(self):
-        return "artist" + str(self.artist_id) + "'s album" + str(self.album_id)
-  
+ 
 class Song(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE, null=True, related_name='songs')
     featuring = models.CharField(max_length=150, blank=True, null=True)
@@ -45,7 +38,7 @@ class Song(models.Model):
     is_title = models.BooleanField(default=False) # song에서는 의미있는 정보가 아니므로 through사용~, 의미가 있다면 둬도 괜찮음
     lyrics = models.TextField()
     description = models.TextField()
-    genre = models.ManyToManyField(Genre)
+    genre = models.ManyToManyField('genre.Genre')
     duration = models.TimeField()
     released_date = models.DateField()
 
@@ -53,3 +46,10 @@ class Song(models.Model):
         if self.is_title:
             return self.title + " [title]"
         return self.title
+    
+class ArtistAlbum(models.Model):
+    artist = models.ForeignKey('artist.Artist', on_delete=models.PROTECT)
+    album = models.ForeignKey('music.Album', on_delete=models.PROTECT)
+    
+    def __str__(self):
+        return "artist" + str(self.artist_id) + "'s album" + str(self.album_id)

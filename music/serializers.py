@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, permissions
 from .models import Album, Song
 
 
@@ -23,7 +23,7 @@ class AlbumDetailSerializer(AlbumSerializer, serializers.ModelSerializer):
     )
     class Meta(AlbumSerializer.Meta):
         model = Album
-        fields = AlbumSerializer.Meta.fields + ['songs','description','release_at']
+        fields = ['songs','description','release_at'] + AlbumSerializer.Meta.fields
    
 class AlbumArtistSerializer(serializers.ModelSerializer):
     artists = ArtistCustomizingField(many=True, read_only=True)
@@ -33,11 +33,11 @@ class AlbumArtistSerializer(serializers.ModelSerializer):
                    
 class SongSerializer(serializers.ModelSerializer):
     duration = serializers.DateTimeField(format='%H:%M')
-    album = AlbumArtistSerializer()
     class Meta:
         model = Song
-        fields = ['id','title','featuring','is_title','duration','album']
+        fields = ['id','title','featuring','is_title','duration']
         
 class SongDetailSerializer(SongSerializer, serializers.ModelSerializer):
+    album = AlbumArtistSerializer() # By default nested serializers are read-only.
     class Meta(SongSerializer.Meta):
-        fields = SongSerializer.Meta.fields + ['lyrics','description','genre','released_date']
+        fields = ['lyrics','description','genre','released_date','album'] + SongSerializer.Meta.fields 

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +42,12 @@ INSTALLED_APPS = [
     'music',
     'artist',
     'genre',
+    'playlist',
     'rest_framework',
+    'rest_framework_jwt',
+    'rest_framework_simplejwt',
+    'drf_yasg',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -52,7 +58,21 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # "user.middleware.JsonWebTokenMiddleWare",
+    'corsheaders.middleware.CorsMiddleware', # CORS
 ]
+
+# CORS (Cross-Origin Resource Sharing)
+# 다른포트 사용하는 프론트 서버와의 통신을 위해서 
+
+# 도메인 추가
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+)
+
+# CORS
+CORS_ORIGIN_ALLOW_ALL = True #전체 도메인에 대해서도 추가
 
 ROOT_URLCONF = 'modelPj.urls'
 
@@ -104,6 +124,41 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# By default, Django assumes that the user model is django.contrib.auth.models.User
+# tell Django to use our User model instead of using its own.
+AUTH_USER_MODEL = 'user.User'
+AUTHENTICATION_BACKENDS = (
+    ('django.contrib.auth.backends.ModelBackend'),
+)
+
+# rest_framework
+# Pagination
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+    # 인증된 유저만 헤더에 access token 을 포함하여 유효한 유저만이 접근이 가능해지는 것을 디폴트로. 
+    # permission_classes 변수 설정할 필요가 없음.
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        #api 실행시 인증할 클래스 정의
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+# jwt
+JWT_AUTH = {
+    'JWT_SECRET_KEY': SECRET_KEY, # 사용할 비밀키
+    'JWT_ALGORITHM': 'HS256', # 암호화 알고리즘
+    'JWT_ALLOW_REFRESH': True, # 토큰 갱신 가능여부
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7), # 토큰 유효기간
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=28), #토큰 갱신 유효기간
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'accounts.custom_responses.my_jwt_response_handler'
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

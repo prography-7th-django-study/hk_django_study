@@ -2,6 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+# import dotenv
 
 
 def main():
@@ -19,4 +20,5 @@ def main():
 
 
 if __name__ == '__main__':
+    # dotenv.read_dotenv() # .env파일을 읽도록, 여기에는 암호화/복호화 알고리즘과 비밀키를 넣어줌.
     main()

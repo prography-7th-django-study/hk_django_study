@@ -3,8 +3,8 @@ from datetime import datetime
 
 def get_artist_profile_image_path(self, filename):
     ext = filename.split('.')[-1]
-    filename = self.nick_name + "." +ext
-    return '/'.join(['artist','profile', self.pk, filename])
+    filename = self.stage_name + "." +ext
+    return '/'.join(['artist','profile', str(self.pk), filename])
 
 
 class Group(models.Model):
@@ -20,7 +20,7 @@ class Artist(models.Model):
     stage_name = models.CharField(max_length=150)
     real_name = models.CharField(max_length=150)
     birthday = models.DateField(default=datetime.now)
-    group = models.ManyToManyField(Group, blank=True)
+    group = models.ManyToManyField('artist.Group', blank=True)
     agency = models.CharField(max_length=150, blank=True, null=True)
     introduction = models.TextField()
     career = models.TextField(default='없음')

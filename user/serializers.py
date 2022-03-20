@@ -1,17 +1,16 @@
 from rest_framework import serializers
-'''
-  Serializer 는 queryset 과 model instance 같은 것들을 쉽게 JSON 또는 XML 의 데이터 형태로 렌더링 할 수 있게 해준다.
-  Form 과 유사하게 데이터의 유효성 검사 및 데이터베이스로 저장한다.
-'''
-from .models import PlayList, User, Relationship
+from .models import User, Relationship
+from rest_framework_jwt.settings import api_settings
+from rest_framework_simplejwt.tokens import RefreshToken
+from user.models import User
 
 
 # CustomizingFields  
 class PlayListCustomizingField(serializers.RelatedField):
     def to_representation(self, value):
         return "PlayList %d of %s" % (value.pk, value.name)
-      
-class SongCustomizingField(serializers.RelatedField): # music과 song이 뒤섞인 느낌..
+
+class SongCustomizingField(serializers.RelatedField):
     def to_representation(self, value):
         if value.is_title:
             return "Song %d: %s [title]" % (value.pk, value.title)
@@ -27,10 +26,40 @@ class RelationshipCustomizingField(serializers.RelatedField):
         return "%s" % (value.nickname)
      
 # Serializers 
+class UserSerializerWithToken(serializers.ModelSerializer):
+    token = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True)
+    
+    def get_token(self, obj):
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+        
+        payload = jwt_payload_handler(obj)
+        token = jwt_encode_handler(payload)
+        return token
+    
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        instance = self.Meta.mode(**validated_data)
+        if password is not None:
+            instance.set_password(password)
+        instance.save()
+        return instance
+    
+    class Meta:
+        model = User
+        fields = ['token','nickname','password']
+        
+    
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','nickname','is_active','is_admin']
+
 class UserListSerializer(serializers.ModelSerializer):
   class Meta:
       model = User
-      fields = ['id','nickname','profile_image'] # 필드를 명확하게 밝히는게 중요
+      fields = ['id','nickname','profile_image']
       
 class UserDetailSerializer(serializers.ModelSerializer):
     joined_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M")
@@ -56,19 +85,33 @@ class UserPasswordSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id','nickname','password']
 
-class PlayListSerializer(serializers.ModelSerializer):  
-    user_id = serializers.PrimaryKeyRelatedField(many=False, read_only=True) # represent the target of the relationship using its primary key.
-    musics = SongCustomizingField(many=True, read_only=True) # music에 있는 song들을 'pk:title' 로 보여주기위한 customizing
-    class Meta:
-        model = PlayList
-        fields = ['id','name','user_id','musics']
-    
-class PlayListDetailSerializer(PlayListSerializer, serializers.ModelSerializer):
-    class Meta(PlayListSerializer.Meta):
-        fields = PlayListSerializer.Meta.fields + ['created_at','updated_at']
-
 class RelationshipSerializer(serializers.ModelSerializer):
     follow_at = serializers.DateTimeField(format="%Y/%m/%d %H:%M")
     class Meta:
         model = Relationship
         fields = ['following','follower','follow_at']
+        
+class RegistrationSerializer(serializers.ModelSerializer):
+    """Serializers registration requests and creates a new user."""
+
+    # Ensure passwords are at least 8 characters long, no longer than 128
+    # characters, and can not be read by the client.
+    password = serializers.CharField(
+        max_length=128,
+        write_only=True
+    )
+
+    # The client should not be able to send a token along with a registration
+    # request. Making `token` read-only handles that for us.
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    class Meta:
+        model = User
+        # List all of the fields that could possibly be included in a request
+        # or response, including fields specified explicitly above.
+        fields = ['nickname', 'password', 'token']
+
+    def create(self, validated_data):
+        # Use the `create_user` method we wrote earlier to create a new user.
+        print(validated_data)
+        return User.objects.create_user(**validated_data)
