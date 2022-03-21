@@ -9,10 +9,12 @@ def get_profile_image_path(self, filename):
     return '/'.join(['profile', self.pk, filename])
 
 class UserManager(BaseUserManager): # use only password, last_login columns
-    def _create_user(self, nickname, password, **extra_fields):
+    def _create_user(self, nickname, password=None, **extra_fields):
         if not nickname:
             raise ValueError("The given nickname must be set")
-        user = self.model(nickname=nickname, **extra_fields)
+        user = self.model(
+            nickname=nickname,
+            **extra_fields,)
         user.password = make_password(password) #hash화
         user.save(using=self._db)
         return user
@@ -40,7 +42,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     # giving you all the methods and database fields necessary to support Django’s permission model.
     nickname = models.CharField(max_length=150, unique=True,
                                 error_messages={'unique': 'Nickname is already in use.'})
-    password = models.CharField(max_length=150)
     profile_image = models.ImageField(upload_to=get_profile_image_path, blank=True, null=True) 
     introduction = models.TextField(blank=True, null=True)
     joined_at = models.DateTimeField(auto_now_add=True)

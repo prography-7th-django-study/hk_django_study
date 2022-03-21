@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status, permissions
 from .models import Relationship, User
 from .serializers import *
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from .serializers import RegistrationSerializer
 from django.views.decorators.csrf import csrf_exempt
@@ -16,6 +16,7 @@ from django.db.utils import IntegrityError
 
 
 @csrf_exempt # csrf와 관련된 인증은 사용하지 않을 것이기 때문에 csrf인증을 사용하지 않음을 명시
+@api_view(["POST"])
 def login_view(request):
     data = {} # JsonResponse
     status = HTTPStatus.OK # 200
@@ -48,6 +49,7 @@ def login_view(request):
 
 
 @csrf_exempt
+@api_view(["POST"])
 def signup_view(request):
     data = {}
     status = HTTPStatus.CREATED
@@ -59,7 +61,7 @@ def signup_view(request):
             nickname = json_body.get("nickname", None)
             password = json_body.get("password", None)
             password_confirm = json_body.get("passwordConfirm", None)
-
+            print('?')
             if not nickname or not password or not password_confirm:
                 raise ValueError()
 
@@ -69,14 +71,12 @@ def signup_view(request):
             nickname_validator = ASCIIUsernameValidator(
                 message="Please check the nickname condition."
             )
-
             nickname_validator(nickname)
             validate_password(password)
 
-            user = User.objects.create_user(nickname=nickname)
+            user = User.objects.create(nickname=nickname)
             user.set_password(password)
             user.save()
-
             data["access_token"] = generate_access_token(nickname)
             data["nickname"] = nickname
 

@@ -1,6 +1,6 @@
 import os
 import jwt
-import datetime
+from datetime import datetime
 from datetime import timedelta
 
 JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM")
@@ -8,7 +8,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 
 def encode_jwt(data):
-    return jwt.encode(data, SECRET_KEY, algorithm=JWT_ALGORITHM).decode("utf-8")
+    return jwt.encode(data, SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 def decode_jwt(access_token):
     return jwt.decode(
