@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status, permissions
 from .models import Relationship, User
 from .serializers import *
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from .serializers import RegistrationSerializer
 from django.views.decorators.csrf import csrf_exempt
@@ -16,9 +16,12 @@ from django.db.utils import IntegrityError
 
 
 @csrf_exempt # csrf와 관련된 인증은 사용하지 않을 것이기 때문에 csrf인증을 사용하지 않음을 명시
+@api_view(['POST'])
 def login_view(request):
     data = {} # JsonResponse
     status = HTTPStatus.OK # 200
+    serializers = UserLoginSerializer
+    print("login_view")
     try:
         if request.method == "POST": # 사용자가 로그인 정보 입력
             json_body = loads(request.body) # json문자열을 python객체로 변환 (json -> dict)

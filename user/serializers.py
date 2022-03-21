@@ -26,29 +26,22 @@ class RelationshipCustomizingField(serializers.RelatedField):
         return "%s" % (value.nickname)
      
 # Serializers 
-# class UserSerializerWithToken(serializers.ModelSerializer):
-#     token = serializers.SerializerMethodField()
-#     password = serializers.CharField(write_only=True)
-    
-#     def get_token(self, obj):
-#         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-#         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+class UserLoginSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    class Meta:
+        model = User
+        fields = ['nickname','password']
         
-#         payload = jwt_payload_handler(obj)
-#         token = jwt_encode_handler(payload)
-#         return token
-    
-#     def create(self, validated_data):
-#         password = validated_data.pop('password', None)
-#         instance = self.Meta.mode(**validated_data)
-#         if password is not None:
-#             instance.set_password(password)
-#         instance.save()
-#         return instance
-    
-#     class Meta:
-#         model = User
-#         fields = ['token','nickname','password']
+    def validate(self, data):
+        nickname = data.get('nickname',None)
+        user = User.objects.get(nickname=nickname)
+        if user is None:
+            return {
+                'nickname':'None'
+            }
+        self.user = user
+        return data
+
         
     
 class UserSerializer(serializers.ModelSerializer):
