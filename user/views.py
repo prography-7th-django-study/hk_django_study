@@ -3,27 +3,102 @@ from .models import Relationship, User
 from .serializers import *
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from rest_framework.generics import GenericAPIView
 from .serializers import RegistrationSerializer
+from django.views.decorators.csrf import csrf_exempt
+from http import HTTPStatus
+from json import loads
+from user.jwt import generate_access_token
+from django.http import JsonResponse, HttpResponseNotAllowed
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.validators import ASCIIUsernameValidator
+from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 
 
-class RegistrationAPIView(GenericAPIView):
-    # Allow any user (authenticated or not) to hit this endpoint.
-    permission_classes = (AllowAny,)
-    serializer_class = RegistrationSerializer
+@csrf_exempt # csrf와 관련된 인증은 사용하지 않을 것이기 때문에 csrf인증을 사용하지 않음을 명시
+def login_view(request):
+    data = {} # JsonResponse
+    status = HTTPStatus.OK # 200
+    try:
+        if request.method == "POST": # 사용자가 로그인 정보 입력
+            json_body = loads(request.body) # json문자열을 python객체로 변환 (json -> dict)
+            nickname = json_body.get("nickname", None)
+            password = json_body.get("password", None)
 
-    def post(self, request):
-        user = request.data
+            if not nickname or not password:
+                raise ValueError() # 입력값이 잘못됨
 
-        # The create serializer, validate serializer, save serializer pattern
-        # below is common and a lot.
-        # Get familiar with it.
-        serializer = self.serializer_class(data=user)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+            user = User.objects.get(nickname=nickname)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if not user.check_password(password):
+                raise ValueError()
+
+            data["access_token"] = generate_access_token(nickname)
+            data["nickname"] = nickname
+
+        else:
+            return HttpResponseNotAllowed(["POST"])
+
+    except (ValueError, User.DoesNotExist):
+        # Login request validation exception
+        data["error"] = "Invalid form. Please fill it out again."
+        status = HTTPStatus.BAD_REQUEST # 400
+
+    return JsonResponse(data, status=status)
+
+
+@csrf_exempt
+def signup_view(request):
+    data = {}
+    status = HTTPStatus.CREATED
+
+    try:
+        if request.method == "POST":
+            json_body = loads(request.body)
+
+            nickname = json_body.get("nickname", None)
+            password = json_body.get("password", None)
+            password_confirm = json_body.get("passwordConfirm", None)
+
+            if not nickname or not password or not password_confirm:
+                raise ValueError()
+
+            if password != password_confirm:
+                raise ValueError()
+
+            nickname_validator = ASCIIUsernameValidator(
+                message="Please check the nickname condition."
+            )
+
+            nickname_validator(nickname)
+            validate_password(password)
+
+            user = User.objects.create_user(nickname=nickname)
+            user.set_password(password)
+            user.save()
+
+            data["access_token"] = generate_access_token(nickname)
+            data["nickname"] = nickname
+
+        else:
+            return HttpResponseNotAllowed(["POST"])
+
+    except ValidationError as e:
+        # Password validation exception
+        data["error"] = e.messages
+        status = HTTPStatus.BAD_REQUEST
+
+    except IntegrityError:
+        # Duplicate user name exception
+        data["error"] = "Duplicate user name. Please use a different name."
+        status = HTTPStatus.BAD_REQUEST
+
+    except ValueError:
+        # Invalid user request exception
+        data["error"] = "Invalid form. Please fill it out again."
+        status = HTTPStatus.BAD_REQUEST
+
+    return JsonResponse(data, status=status)
     
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
