@@ -9,7 +9,7 @@ def get_profile_image_path(self, filename):
     return '/'.join(['profile', self.pk, filename])
 
 class UserManager(BaseUserManager): # use only password, last_login columns
-    def _create_user(self, nickname, password=None, **extra_fields):
+    def _create_user(self, nickname, password, **extra_fields):
         if not nickname:
             raise ValueError("The given nickname must be set")
         user = self.model(

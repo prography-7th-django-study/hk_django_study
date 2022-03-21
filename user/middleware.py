@@ -1,8 +1,9 @@
+from jwt import ExpiredSignatureError
+
 from .models import User
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 from .jwt import decode_jwt
-from jwt.exceptions import ExpiredSignatureError
 from http import HTTPStatus
 
 
@@ -21,14 +22,15 @@ class JsonWebTokenMiddleWare(object):
                 and request.path != "/login"
                 and "admin" not in request.path
             ):
+                print('?')
                 headers = request.headers
                 access_token = headers.get("Authorization", None)
 
                 if not access_token:
                     raise PermissionDenied()
-
+                print(access_token)
                 payload = decode_jwt(access_token)
-
+                print('???')
                 nickname = payload.get("nickname", None)
 
                 if not nickname:
@@ -37,7 +39,7 @@ class JsonWebTokenMiddleWare(object):
                 User.objects.get(nickname=nickname)
 
             response = self.get_response(request)
-
+            print('?')
             return response
 
         except (PermissionDenied, User.DoesNotExist):
