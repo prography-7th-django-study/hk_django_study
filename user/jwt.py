@@ -11,13 +11,13 @@ JWT_ALGORITHM = 'HS256'
 SECRET_KEY = SECRET_KEY
 
 def encode_jwt(data):
-    return jwt.encode(data, SECRET_KEY, algorithm=JWT_ALGORITHM).decode("utf-8")
+    return jwt.encode(data, SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 def decode_jwt(access_token):
     return jwt.decode(
         access_token,
         SECRET_KEY,
-        algorithms=[JWT_ALGORITHM],
+        algorithms=JWT_ALGORITHM,
         options={"verify_nickname": False},
     )
     

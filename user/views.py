@@ -51,6 +51,7 @@ def login_view(request):
 
 
 @csrf_exempt
+@api_view(['POST'])
 def signup_view(request):
     data = {}
     status = HTTPStatus.CREATED
@@ -76,7 +77,7 @@ def signup_view(request):
             nickname_validator(nickname)
             validate_password(password)
 
-            user = User.objects.create_user(nickname=nickname)
+            user = User.objects.create(nickname=nickname)
             user.set_password(password)
             user.save()
 

@@ -21,7 +21,6 @@ class JsonWebTokenMiddleWare(object):
                 and request.path != "/login"
                 and "admin" not in request.path
             ):
-                print("middleware")
                 headers = request.headers
                 access_token = headers.get("Authorization", None)
 
@@ -38,7 +37,6 @@ class JsonWebTokenMiddleWare(object):
                 User.objects.get(nickname=nickname)
 
             response = self.get_response(request)
-            print("response ===>>>>",response)
             return response
 
         except (PermissionDenied, User.DoesNotExist):

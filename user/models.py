@@ -40,15 +40,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     # giving you all the methods and database fields necessary to support Django’s permission model.
     nickname = models.CharField(max_length=150, unique=True,
                                 error_messages={'unique': 'Nickname is already in use.'})
-    password = models.CharField(max_length=150)
+    # password = models.CharField(max_length=150) # abstractbaseuser에 정의되어있어서 필요없음.
     profile_image = models.ImageField(upload_to=get_profile_image_path, blank=True, null=True) 
     introduction = models.TextField(blank=True, null=True)
     joined_at = models.DateTimeField(auto_now_add=True)
-    followers = models.ManyToManyField("self", through='Relationship', blank=True) # relationship이 알아보기 어려워서 followers로 바꿈..
-    like_musics = models.ManyToManyField('music.Song', blank=True, related_name="users_like")
-    like_genres = models.ManyToManyField('genre.Genre', blank=True)
-    like_playlists = models.ManyToManyField('playlist.PlayList', blank=True, related_name="users_like")
-    # like는 쓰지 말자~
+    followers = models.ManyToManyField("self", through='Relationship', blank=True)
+    favorite_musics = models.ManyToManyField('music.Song', blank=True, related_name="users_favorite")
+    favorite_genres = models.ManyToManyField('genre.Genre', blank=True)
+    favorite_playlists = models.ManyToManyField('playlist.PlayList', blank=True, related_name="users_favorite")
     
     # When a user no longer wishes to use our platform, they may try to delete
     # their account. That's a problem for us because the data we collect is
@@ -69,31 +68,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def __str__(self):
         return self.nickname
-    
-    # @property
-    # def token(self):
-    #     """
-    #     Allows us to get a user's token by calling `user.token` instead of
-    #     `user.generate_jwt_token().
-
-    #     The `@property` decorator above makes this possible. `token` is called
-    #     a "dynamic property".
-    #     """
-    #     return self._generate_jwt_token()
-    
-    # def _generate_jwt_token(self):
-    #     """
-    #     Generates a JSON Web Token that stores this user's ID and has an expiry
-    #     date set to 60 days into the future.
-    #     """
-    #     dt = datetime.now() + timedelta(days=60)
-
-    #     token = jwt.encode({
-    #         'id': self.pk,
-    #         'exp': int(dt.strftime("%S")),
-    #     }, settings.SECRET_KEY, algorithm='HS256')
-
-    #     return token.decode('utf-8')
     
     def has_perm(self, perm, obj=None):
         return True
