@@ -8,7 +8,6 @@ from modelPj.settings import SECRET_KEY
 # JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM")
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 JWT_ALGORITHM = 'HS256'
-SECRET_KEY = SECRET_KEY
 
 def encode_jwt(data):
     return jwt.encode(data, SECRET_KEY, algorithm=JWT_ALGORITHM)
