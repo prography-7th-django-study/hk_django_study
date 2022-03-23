@@ -15,12 +15,13 @@ from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 
 
+
 @csrf_exempt # csrf와 관련된 인증은 사용하지 않을 것이기 때문에 csrf인증을 사용하지 않음을 명시
 @api_view(['POST'])
 def login_view(request):
     data = {} # JsonResponse
     status = HTTPStatus.OK # 200
-    serializers = UserLoginSerializer
+
     print("login_view")
     try:
         if request.method == "POST": # 사용자가 로그인 정보 입력
@@ -46,8 +47,8 @@ def login_view(request):
         # Login request validation exception
         data["error"] = "Invalid form. Please fill it out again."
         status = HTTPStatus.BAD_REQUEST # 400
-
-    return JsonResponse(data, status=status)
+        
+    return Response(data, status=status)
 
 
 @csrf_exempt
@@ -55,7 +56,7 @@ def login_view(request):
 def signup_view(request):
     data = {}
     status = HTTPStatus.CREATED
-
+    print("signup view")
     try:
         if request.method == "POST":
             json_body = loads(request.body)
@@ -102,7 +103,7 @@ def signup_view(request):
         data["error"] = "Invalid form. Please fill it out again."
         status = HTTPStatus.BAD_REQUEST
 
-    return JsonResponse(data, status=status)
+    return Response(data, status=status)
     
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
