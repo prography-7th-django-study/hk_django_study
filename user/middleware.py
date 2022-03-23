@@ -4,7 +4,7 @@ from django.core.exceptions import PermissionDenied
 from .jwt import decode_jwt
 from jwt.exceptions import ExpiredSignatureError
 from http import HTTPStatus
-
+from rest_framework.permissions import SAFE_METHODS
 
 class JsonWebTokenMiddleWare(object):
   
@@ -20,6 +20,7 @@ class JsonWebTokenMiddleWare(object):
                 request.path != "/signup"
                 and request.path != "/login"
                 and "admin" not in request.path
+                and request.path != SAFE_METHODS
             ):
                 headers = request.headers
                 access_token = headers.get("Authorization", None)
