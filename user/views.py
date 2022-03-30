@@ -21,9 +21,9 @@ from django.db.utils import IntegrityError
 def login_view(request):
     data = {} # JsonResponse
     status = HTTPStatus.OK # 200
-
-    print("login_view")
+    
     try:
+        print("login_view")
         if request.method == "POST": # 사용자가 로그인 정보 입력
             json_body = loads(request.body) # json문자열을 python객체로 변환 (json -> dict)
             nickname = json_body.get("nickname", None)

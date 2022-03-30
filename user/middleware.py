@@ -16,12 +16,11 @@ class JsonWebTokenMiddleWare(object):
         # the view (and later middleware) are called.
         try:
             # 토큰을 포함하지 않아도 되는 요청을 path를 이용해 분기
-            if (
-                request.path != "/signup"
-                and request.path != "/login"
-                and "admin" not in request.path
-                and request.path != SAFE_METHODS
-            ):
+            if (request.path != "/signup" and request.path != "/login" and 
+                "admin" not in request.path and 
+                "swagger" not in request.path and 
+                request.method not in SAFE_METHODS):
+                print('s')
                 headers = request.headers
                 access_token = headers.get("Authorization", None)
 

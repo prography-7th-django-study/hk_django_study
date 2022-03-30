@@ -13,3 +13,6 @@ class PlayList(models.Model):
         if self.is_public is True:
             return str(self.user_id) + "의 공개 재생목록_" + str(self.pk)
         return str(self.user_id) + "의 비공개 재생목록_" + str(self.pk)
+    
+    class Meta:
+        ordering = ["id"]
