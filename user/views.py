@@ -19,6 +19,13 @@ from django.db.utils import IntegrityError
 @csrf_exempt # csrf와 관련된 인증은 사용하지 않을 것이기 때문에 csrf인증을 사용하지 않음을 명시
 @api_view(['POST'])
 def login_view(request):
+    '''
+    # 사용자 로그인 API
+    # nickname으로 사용자를 구분한다.
+    ---
+    ## URL
+        '/login'
+    '''
     data = {} # JsonResponse
     status = HTTPStatus.OK # 200
     
@@ -54,6 +61,13 @@ def login_view(request):
 @csrf_exempt
 @api_view(['POST'])
 def signup_view(request):
+    '''
+    # 사용자 회원가입 API
+    # nickname으로 사용자를 구분한다.
+    ---
+    ## URL
+        '/signup'
+    '''
     data = {}
     status = HTTPStatus.CREATED
     print("signup view")
@@ -106,6 +120,17 @@ def signup_view(request):
     return Response(data, status=status)
     
 class UserViewSet(viewsets.ModelViewSet):
+    '''
+    # 사용자 조회, 상세 조회, 비밀번호 수정 하는 API
+    ---
+    ## URL
+    ## 사용자 조회
+        '/users'
+    ## 사용자 상세 조회
+        '/users/{id}
+    ## 사용자 비밀번호 수정
+        'users/{id}/set_password'
+    '''
     queryset = User.objects.all()
     
     def get_serializer_class(self):
@@ -127,5 +152,17 @@ class UserViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)    
       
 class RelationshipViewSet(viewsets.ModelViewSet):
+    '''
+    # 사용자간 팔로우 조회 API
+    ---
+    ## URL
+    ## 팔로우 관계 조회
+        '/playlists'
+    ## 특정 사용자 팔로우 상세 조회
+    - follower
+    - followee
+    - follow 시간
+        '/playlists/{id}'
+    '''
     queryset = Relationship.objects.all()
     serializer_class = RelationshipSerializer

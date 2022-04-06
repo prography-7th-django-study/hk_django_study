@@ -20,7 +20,7 @@ class JsonWebTokenMiddleWare(object):
                 "admin" not in request.path and 
                 "swagger" not in request.path and 
                 request.method not in SAFE_METHODS):
-                print('s')
+
                 headers = request.headers
                 access_token = headers.get("Authorization", None)
 
